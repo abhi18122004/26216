@@ -196,3 +196,61 @@ With proper indexing and optimized query structure:
 - Query execution becomes faster
 - Reduced load on database
 - Better scalability for large datasets
+
+# Stage 4: Performance Optimization
+
+## Problem Scenario
+
+When a large number of users are accessing notifications at the same time, the database can become overloaded, leading to slow response times.
+
+---
+
+## Solutions
+
+### 1. Caching (Redis)
+
+Instead of querying the database repeatedly for the same user, we can cache frequently accessed notifications using Redis.
+
+- Faster reads
+- Reduces database load
+
+---
+
+### 2. Pagination
+
+We should avoid fetching all notifications at once.
+
+Example:
+- Limit results to 10–20 per request
+- Load more when needed
+
+This reduces:
+- Memory usage
+- Query time
+
+---
+
+### 3. Lazy Loading
+
+Notifications can be loaded only when the user scrolls.
+
+This ensures:
+- Better user experience
+- Reduced initial load
+
+---
+
+### 4. Background Processing
+
+Heavy operations (like sending notifications to many users) should be handled asynchronously using background workers.
+
+This prevents blocking the main application.
+
+---
+
+## Result
+
+By combining caching, pagination, and async processing:
+- System becomes faster
+- Database load is reduced
+- Application scales better under heavy traffic
