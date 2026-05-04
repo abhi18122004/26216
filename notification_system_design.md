@@ -84,3 +84,56 @@ Example:
 - "fetch notifications request received"
 - "notification marked as read"
 - "error while fetching notifications"
+
+# Stage 2: Database Design
+
+## 1. Database Choice
+
+For storing notifications, I would use PostgreSQL.
+
+The main reason is that notifications follow a structured format (user_id, message, type, etc.), so a relational database fits well. PostgreSQL also provides strong support for indexing and querying, which will be useful when fetching notifications efficiently for a large number of users.
+
+---
+
+## 2. Table Schema
+
+The core table in the system will be the `notifications` table.
+
+| Column Name | Type      | Description                          |
+|-------------|----------|--------------------------------------|
+| id          | UUID     | Unique identifier for each notification |
+| user_id     | INT      | ID of the user receiving the notification |
+| type        | VARCHAR  | Type of notification (placement, result, etc.) |
+| message     | TEXT     | Actual notification content          |
+| is_read     | BOOLEAN  | Indicates whether the notification is read |
+| created_at  | TIMESTAMP| Timestamp when the notification was created |
+
+This schema keeps things simple and allows us to efficiently query notifications based on user and status.
+
+---
+
+## 3. Indexing Strategy
+
+Since notifications will be frequently fetched for a specific user, indexing becomes important.
+
+- An index on `user_id` will help quickly retrieve notifications for a user  
+- An index on `is_read` helps when filtering unread notifications  
+- A composite index on `(user_id, is_read, created_at)` will improve performance for common queries like fetching unread notifications in sorted order  
+
+Example:
+
+CREATE INDEX idx_notifications  
+ON notifications(user_id, is_read, created_at);
+
+---
+
+## 4. Scalability Considerations
+
+As the number of users grows, the system should still perform efficiently. Some strategies I would consider:
+
+- Using pagination to avoid loading too many records at once  
+- Partitioning the table if the dataset becomes very large  
+- Introducing caching (e.g., Redis) for frequently accessed notifications  
+- Archiving old notifications to reduce load on the main table  
+
+These steps ensure that the system remains responsive even with a large number of users and notifications.
