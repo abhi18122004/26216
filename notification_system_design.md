@@ -137,3 +137,62 @@ As the number of users grows, the system should still perform efficiently. Some 
 - Archiving old notifications to reduce load on the main table  
 
 These steps ensure that the system remains responsive even with a large number of users and notifications.
+
+# Stage 3: Query Optimization
+
+## Given Query
+
+SELECT * 
+FROM notifications 
+WHERE studentID = 1042 AND isRead = false
+ORDER BY createdAt ASC;
+
+---
+
+## Problems in the Query
+
+There are a few issues with this query:
+
+1. **No proper indexing**
+   - Without an index, the database will perform a full table scan, which becomes slow as data grows.
+
+2. **Using SELECT ***
+   - Fetching all columns is unnecessary and increases data transfer time.
+
+3. **Sorting without index**
+   - ORDER BY createdAt can be expensive if not supported by an index.
+
+---
+
+## Optimized Approach
+
+### 1. Add Composite Index
+
+To improve performance, we can create a composite index:
+
+CREATE INDEX idx_notifications 
+ON notifications(studentID, isRead, createdAt);
+
+This helps:
+- Filter faster (studentID + isRead)
+- Sort faster (createdAt)
+
+---
+
+### 2. Avoid SELECT *
+
+Instead of fetching all columns, we should fetch only required fields:
+
+SELECT id, type, message, createdAt
+FROM notifications
+WHERE studentID = 1042 AND isRead = false
+ORDER BY createdAt ASC;
+
+---
+
+## Result
+
+With proper indexing and optimized query structure:
+- Query execution becomes faster
+- Reduced load on database
+- Better scalability for large datasets
