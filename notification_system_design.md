@@ -254,3 +254,88 @@ By combining caching, pagination, and async processing:
 - System becomes faster
 - Database load is reduced
 - Application scales better under heavy traffic
+
+# Stage 5: Scalable Notification System Design
+
+## Problem
+
+We need to send notifications to a large number of users (e.g., 50,000 users) efficiently without overloading the system.
+
+---
+
+## Naive Approach (Not Recommended)
+
+A simple loop sending notifications one by one:
+
+for each user:
+    send notification
+
+Problems:
+- Slow and inefficient
+- Blocks the main server
+- High risk of failure under load
+
+---
+
+## Optimized Approach
+
+### 1. Use Message Queue
+
+Instead of sending notifications directly, we push tasks to a queue.
+
+Examples:
+- Kafka
+- RabbitMQ
+
+---
+
+### 2. Asynchronous Processing
+
+Worker services consume tasks from the queue and process them independently.
+
+This ensures:
+- Non-blocking system
+- Better scalability
+
+---
+
+### 3. Batch Processing
+
+Notifications can be processed in batches instead of one-by-one.
+
+Benefits:
+- Faster execution
+- Reduced overhead
+
+---
+
+### 4. Retry Mechanism
+
+If a notification fails:
+- Retry automatically
+- Prevent data loss
+
+---
+
+## Final Flow
+
+User Request → Backend API → Queue → Worker → Notification Sent
+
+---
+
+## Logging Integration
+
+Logging middleware will be used at each step:
+
+- Info log → notification request received
+- Debug log → message pushed to queue
+- Error log → failure in sending notification
+
+---
+
+## Result
+
+This architecture ensures:
+- High scalability
+- Faster processing
+- Reliable delivery
